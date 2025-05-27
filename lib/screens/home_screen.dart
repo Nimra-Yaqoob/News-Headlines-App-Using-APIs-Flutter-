@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:news_mobileapp/models/categories_news_model.dart';
 import 'package:news_mobileapp/models/news_channel_headlines_modle.dart';
 import 'package:news_mobileapp/screens/categories_screen.dart';
 import 'package:news_mobileapp/view_model/news_view_model.dart';
@@ -21,17 +22,18 @@ class _HomeScreenState extends State<HomeScreen> {
   FilterList? selectedMenu;
   final format = DateFormat('MMMM dd, yyyy');
   String name = 'bbc-news';
-
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width * 1;
     final height = MediaQuery.sizeOf(context).height * 1;
-
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context)=>CategoriesScreen()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => CategoriesScreen()),
+            );
           },
           icon: Image.asset(
             'assets/images/category_icon.png',
@@ -86,11 +88,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     value: FilterList.aljazeer,
                     child: Text('Al-jazeera News'),
                   ),
-                   PopupMenuItem<FilterList>(
+                  PopupMenuItem<FilterList>(
                     value: FilterList.aljazeer,
                     child: Text('Crypto News'),
                   ),
-                   PopupMenuItem<FilterList>(
+                  PopupMenuItem<FilterList>(
                     value: FilterList.aljazeer,
                     child: Text('Entertainment weekly'),
                   ),
@@ -103,8 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
           SizedBox(
             height: height * .55,
             width: width,
-            child: 
-            FutureBuilder<NewsChannelsHeadlinesModel>(
+            child: FutureBuilder<NewsChannelsHeadlinesModel>(
               future: newsViewModel.fetchNewChannelHeadlinesApi(name),
               builder: (BuildContext context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -134,8 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 padding: EdgeInsets.symmetric(
                                   horizontal: height * .02,
                                 ),
-                                child:
-                                 ClipRRect(
+                                child: ClipRRect(
                                   borderRadius: BorderRadius.circular(15),
                                   child: CachedNetworkImage(
                                     imageUrl:
@@ -155,7 +155,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                   ),
                                 ),
-                              
                               ),
                               Positioned(
                                 bottom: 20,
@@ -238,7 +237,108 @@ class _HomeScreenState extends State<HomeScreen> {
                 }
               },
             ),
-         
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: FutureBuilder<CategoriesNewsModel>(
+              future: newsViewModel.fetchCategoriesNewsApi('general'),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: SpinKitCircle(size: 40, color: Colors.blue),
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData ||
+                    snapshot.data!.articles == null) {
+                  return const Center(child: Text('No data found'));
+                } else {
+                  return ListView.builder(
+                    physics:
+                        NeverScrollableScrollPhysics(), 
+                    shrinkWrap:
+                        true, 
+                    itemCount: snapshot.data!.articles!.length,
+                    itemBuilder: (context, index) {
+                      final article = snapshot.data!.articles![index];
+                      DateTime dateTime = DateTime.parse(article.publishedAt!);
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 15),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(15),
+                              child: CachedNetworkImage(
+                                imageUrl: article.urlToImage ?? '',
+                                fit: BoxFit.cover,
+                                height: height * .18,
+                                width: width * .3,
+                                placeholder:
+                                    (context, url) => const Center(
+                                      child: SpinKitCircle(
+                                        size: 50,
+                                        color: Colors.blue,
+                                      ),
+                                    ),
+                                errorWidget:
+                                    (context, url, error) => const Icon(
+                                      Icons.error_outline,
+                                      color: Colors.red,
+                                    ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    article.title ?? '',
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          article.source?.name ?? '',
+                                          overflow: TextOverflow.ellipsis,
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 13,
+                                            color: Colors.black54,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                      Text(
+                                        format.format(dateTime),
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          color: Colors.black45,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                }
+              },
+            ),
           ),
         ],
       ),

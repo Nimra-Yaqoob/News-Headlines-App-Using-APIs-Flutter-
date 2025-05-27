@@ -25,12 +25,19 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     'Business',
     'Technology',
   ];
+
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.sizeOf(context).width * 1;
-    final height = MediaQuery.sizeOf(context).height * 1;
+    final width = MediaQuery.sizeOf(context).width;
+    final height = MediaQuery.sizeOf(context).height;
+
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 1,
+        iconTheme: const IconThemeData(color: Colors.black), // Back icon color
+      ),
+
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
@@ -56,15 +63,13 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                   : Colors.grey,
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Center(
-                            child: Text(
-                              CategoriesList[index].toString(),
-                              style: GoogleFonts.poppins(
-                                fontSize: 13,
-                                color: Colors.white,
-                              ),
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Center(
+                          child: Text(
+                            CategoriesList[index],
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              color: Colors.white,
                             ),
                           ),
                         ),
@@ -74,58 +79,111 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 },
               ),
             ),
+
+            const SizedBox(height: 20),
+
             Expanded(
               child: FutureBuilder<CategoriesNewsModel>(
                 future: newsViewModel.fetchCategoriesNewsApi(categoryName),
-                builder: (BuildContext context, snapshot) {
+                builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
                       child: SpinKitCircle(size: 50, color: Colors.blue),
                     );
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData ||
+                      snapshot.data!.articles == null) {
+                    return const Center(child: Text('No data found'));
                   } else {
                     return ListView.builder(
                       itemCount: snapshot.data!.articles!.length,
-                      scrollDirection: Axis.horizontal,
                       itemBuilder: (context, index) {
+                        final article = snapshot.data!.articles![index];
                         DateTime dateTime = DateTime.parse(
-                          snapshot.data!.articles![index].publishedAt
-                              .toString(),
+                          article.publishedAt!,
                         );
-                        return Row(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(15),
-                              child: CachedNetworkImage(
-                                imageUrl:
-                                    snapshot.data!.articles![index].urlToImage
-                                        .toString(),
-                                fit: BoxFit.cover,
-                                height: height* .18,
-                                width: width *.3,
-                                placeholder:
-                                    (context, url) => Container(
-                                      child: Center(
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 15),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(15),
+                                child: CachedNetworkImage(
+                                  imageUrl: article.urlToImage ?? '',
+                                  fit: BoxFit.cover,
+                                  height: height * .18,
+                                  width: width * .3,
+                                  placeholder:
+                                      (context, url) => const Center(
                                         child: SpinKitCircle(
                                           size: 50,
                                           color: Colors.blue,
                                         ),
                                       ),
-                                    ),
-                                errorWidget:
-                                    (context, url, error) => Icon(
-                                      Icons.error_outline,
-                                      color: Colors.red,
-                                    ),
+                                  errorWidget:
+                                      (context, url, error) => const Icon(
+                                        Icons.error_outline,
+                                        color: Colors.red,
+                                      ),
+                                ),
                               ),
-                            ),
-                          ],
+
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      article.title ?? '',
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            article.source?.name ?? '',
+                                            overflow: TextOverflow.ellipsis,
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 13,
+                                              color: Colors.black54,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                        Text(
+                                          format.format(dateTime),
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 12,
+                                            color: Colors.black45,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         );
                       },
                     );
                   }
                 },
               ),
+           
             ),
+         
           ],
         ),
       ),
