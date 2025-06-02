@@ -56,9 +56,20 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                       padding: const EdgeInsets.only(right: 12),
                       child: Container(
                         decoration: BoxDecoration(
+                          gradient:
+                              categoryName == CategoriesList[index]
+                                  ? const LinearGradient(
+                                    colors: [
+                                      Color(0xFF136A8A),
+                                      Color(0xFF267871),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  )
+                                  : null, // no gradient when not selected
                           color:
                               categoryName == CategoriesList[index]
-                                  ? Colors.blue
+                                  ? null
                                   : Colors.grey,
                           borderRadius: BorderRadius.circular(20),
                         ),
@@ -114,10 +125,24 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                   height: height * .18,
                                   width: width * .3,
                                   placeholder:
-                                      (context, url) => const Center(
-                                        child: SpinKitCircle(
-                                          size: 50,
-                                          color: Colors.blue,
+                                      (context, url) => Center(
+                                        child: ShaderMask(
+                                          shaderCallback: (rect) {
+                                            return const LinearGradient(
+                                              colors: [
+                                                Color(0xFF136A8A),
+                                                Color(0xFF267871),
+                                              ],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            ).createShader(rect);
+                                          },
+                                          child: const SpinKitCircle(
+                                            size: 50,
+                                            color:
+                                                Colors
+                                                    .white, // white because gradient will be applied via shader
+                                          ),
                                         ),
                                       ),
                                   errorWidget:
@@ -127,6 +152,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                       ),
                                 ),
                               ),
+
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Column(

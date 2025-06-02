@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.blue.shade400, Colors.blue.shade700],
+                  colors: [Color(0xFF136A8A), Color(0xFF267871)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
