@@ -52,7 +52,7 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
       appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
       body: Stack(
         children: [
-          Container(
+          SizedBox(
             height: height * .45,
             child: ClipRRect(
               borderRadius: BorderRadius.only(
