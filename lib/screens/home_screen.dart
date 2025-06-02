@@ -6,16 +6,22 @@ import 'package:intl/intl.dart';
 import 'package:news_mobileapp/models/categories_news_model.dart';
 import 'package:news_mobileapp/models/news_channel_headlines_modle.dart';
 import 'package:news_mobileapp/screens/categories_screen.dart';
+import 'package:news_mobileapp/screens/news_details_screen.dart';
 import 'package:news_mobileapp/view_model/news_view_model.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
-
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-enum FilterList { bbcNews, aryNews, independent, reuters, cnn, aljazeer }
+enum FilterList {
+  bbcNews,
+  aryNews,
+  aljazeeraNews,
+  cryptoNews,
+  entertainmentWeekly,
+}
 
 class _HomeScreenState extends State<HomeScreen> {
   NewsViewModel newsViewModel = NewsViewModel();
@@ -28,47 +34,78 @@ class _HomeScreenState extends State<HomeScreen> {
     final height = MediaQuery.sizeOf(context).height * 1;
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => CategoriesScreen()),
-            );
-          },
-          icon: Image.asset(
-            'assets/images/category_icon.png',
-            height: 30,
-            width: 30,
-          ),
-        ),
-        title: Center(
-          child: Text(
-            'News',
-            style: GoogleFonts.poppins(
-              fontSize: 24,
-              fontWeight: FontWeight.w700,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 12.0),
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => CategoriesScreen()),
+              );
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.blue.shade400, Colors.blue.shade700],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 6,
+                    offset: Offset(2, 4),
+                  ),
+                ],
+              ),
+              padding: EdgeInsets.all(8),
+              child: Image.asset(
+                'assets/images/categories.png',
+                height: 22,
+                width: 22,
+                color: Colors.white,
+              ),
             ),
           ),
+        ),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Center(
+              child: Text(
+                'ZNews',
+                style: GoogleFonts.poppins(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.black87,
+                  letterSpacing: 1,
+                ),
+              ),
+            ),
+          ],
         ),
         actions: [
           PopupMenuButton<FilterList>(
             initialValue: selectedMenu,
             icon: Icon(Icons.more_vert, color: Colors.black),
             onSelected: (FilterList item) {
-              if (FilterList.bbcNews.name == item.name) {
-                name = 'bbc-news';
-              }
-              if (FilterList.aryNews.name == item.name) {
-                name = 'ary-news';
-              }
-              if (FilterList.aljazeer.name == item.name) {
-                name = 'al-jazeera-english';
-              }
-              if (FilterList.aljazeer.name == item.name) {
-                name = 'crypto-coins-news';
-              }
-              if (FilterList.aljazeer.name == item.name) {
-                name = 'entertainment-weekly';
+              switch (item) {
+                case FilterList.bbcNews:
+                  name = 'bbc-news';
+                  break;
+                case FilterList.aryNews:
+                  name = 'business-insider';
+                  break;
+                case FilterList.aljazeeraNews:
+                  name = 'al-jazeera-english';
+                  break;
+                case FilterList.cryptoNews:
+                  name = 'crypto-coins-news';
+                  break;
+                case FilterList.entertainmentWeekly:
+                  name = 'entertainment-weekly';
+                  break;
               }
               setState(() {
                 selectedMenu = item;
@@ -78,23 +115,73 @@ class _HomeScreenState extends State<HomeScreen> {
                 (context) => <PopupMenuEntry<FilterList>>[
                   PopupMenuItem<FilterList>(
                     value: FilterList.bbcNews,
-                    child: Text('BBC News'),
+                    child: Row(
+                      children: [
+                        Image.asset(
+                          'assets/images/bbc.png',
+                          height: 50,
+                          width: 50,
+                        ),
+                        SizedBox(width: 10),
+                        Text('BBC News'),
+                      ],
+                    ),
                   ),
                   PopupMenuItem<FilterList>(
                     value: FilterList.aryNews,
-                    child: Text('Ary News'),
+                    child: Row(
+                      children: [
+                        Image.asset(
+                          'assets/images/BB.png',
+                          height: 35,
+                          width: 35,
+                        ),
+                        SizedBox(width: 10),
+                        Text('Business News'),
+                      ],
+                    ),
                   ),
                   PopupMenuItem<FilterList>(
-                    value: FilterList.aljazeer,
-                    child: Text('Al-jazeera News'),
+                    value: FilterList.aljazeeraNews,
+                    child: Row(
+                      children: [
+                        Image.asset(
+                          'assets/images/alj.png',
+                          height: 40,
+                          width: 40,
+                        ),
+                        SizedBox(width: 10),
+                        Text('Al-jazeera News'),
+                      ],
+                    ),
                   ),
                   PopupMenuItem<FilterList>(
-                    value: FilterList.aljazeer,
-                    child: Text('Crypto News'),
+                    value: FilterList.cryptoNews,
+                    child: Row(
+                      children: [
+                        Image.asset(
+                          'assets/images/crypto.png',
+                          height: 30,
+                          width: 30,
+                        ),
+                        SizedBox(width: 10),
+                        Text('Crypto News'),
+                      ],
+                    ),
                   ),
                   PopupMenuItem<FilterList>(
-                    value: FilterList.aljazeer,
-                    child: Text('Entertainment weekly'),
+                    value: FilterList.entertainmentWeekly,
+                    child: Row(
+                      children: [
+                        Image.asset(
+                          'assets/images/entertainment.png',
+                          height: 25,
+                          width: 25,
+                        ),
+                        SizedBox(width: 10),
+                        Text('Entertainment Weekly'),
+                      ],
+                    ),
                   ),
                 ],
           ),
@@ -120,11 +207,47 @@ class _HomeScreenState extends State<HomeScreen> {
                       DateTime dateTime = DateTime.parse(
                         snapshot.data!.articles![index].publishedAt.toString(),
                       );
-                      return Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: width * .04,
-                          vertical: height * 0.02,
-                        ),
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => NewsDetailsScreen(
+                                    newImage:
+                                        snapshot
+                                            .data!
+                                            .articles![index]
+                                            .urlToImage
+                                            .toString(),
+                                    author:
+                                        snapshot.data!.articles![index].title
+                                            .toString(),
+                                    content:
+                                        snapshot
+                                            .data!
+                                            .articles![index]
+                                            .publishedAt
+                                            .toString(),
+                                    description:
+                                        snapshot.data!.articles![index].author
+                                            .toString(),
+                                    newsData:
+                                        snapshot
+                                            .data!
+                                            .articles![index]
+                                            .description
+                                            .toString(),
+                                    newsTitle:
+                                        snapshot.data!.articles![index].content
+                                            .toString(),
+                                    source:
+                                        snapshot.data!.articles![index].source
+                                            .toString(),
+                                  ),
+                            ),
+                          );
+                        },
                         child: SizedBox(
                           child: Stack(
                             alignment: Alignment.center,
@@ -195,7 +318,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           width: width * 0.9,
                                           child: Row(
                                             mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
+                                                MainAxisAlignment.center,
                                             children: [
                                               Text(
                                                 snapshot
@@ -254,15 +377,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   return const Center(child: Text('No data found'));
                 } else {
                   return ListView.builder(
-                    physics:
-                        NeverScrollableScrollPhysics(), 
-                    shrinkWrap:
-                        true, 
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
                     itemCount: snapshot.data!.articles!.length,
                     itemBuilder: (context, index) {
                       final article = snapshot.data!.articles![index];
                       DateTime dateTime = DateTime.parse(article.publishedAt!);
-
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 15),
                         child: Row(
@@ -294,14 +414,68 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    article.title ?? '',
-                                    maxLines: 3,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.black87,
+                                  InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) => NewsDetailsScreen(
+                                                newImage:
+                                                    snapshot
+                                                        .data!
+                                                        .articles![index]
+                                                        .urlToImage
+                                                        .toString(),
+                                                author:
+                                                    snapshot
+                                                        .data!
+                                                        .articles![index]
+                                                        .title
+                                                        .toString(),
+                                                content:
+                                                    snapshot
+                                                        .data!
+                                                        .articles![index]
+                                                        .publishedAt
+                                                        .toString(),
+                                                description:
+                                                    snapshot
+                                                        .data!
+                                                        .articles![index]
+                                                        .author
+                                                        .toString(),
+                                                newsData:
+                                                    snapshot
+                                                        .data!
+                                                        .articles![index]
+                                                        .description
+                                                        .toString(),
+                                                newsTitle:
+                                                    snapshot
+                                                        .data!
+                                                        .articles![index]
+                                                        .content
+                                                        .toString(),
+                                                source:
+                                                    snapshot
+                                                        .data!
+                                                        .articles![index]
+                                                        .source
+                                                        .toString(),
+                                              ),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      article.title ?? '',
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.black87,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(height: 8),

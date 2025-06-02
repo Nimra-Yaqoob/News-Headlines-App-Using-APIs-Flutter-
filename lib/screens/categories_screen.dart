@@ -4,6 +4,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:news_mobileapp/models/categories_news_model.dart';
+import 'package:news_mobileapp/screens/news_details_screen.dart';
 import 'package:news_mobileapp/view_model/news_view_model.dart';
 
 class CategoriesScreen extends StatefulWidget {
@@ -17,7 +18,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   NewsViewModel newsViewModel = NewsViewModel();
   final format = DateFormat('MMMM dd, yyyy');
   String categoryName = 'general';
-
   List<String> CategoriesList = [
     'General',
     'Entertainment',
@@ -37,7 +37,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         elevation: 1,
         iconTheme: const IconThemeData(color: Colors.black), // Back icon color
       ),
-
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
@@ -79,9 +78,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 },
               ),
             ),
-
             const SizedBox(height: 20),
-
             Expanded(
               child: FutureBuilder<CategoriesNewsModel>(
                 future: newsViewModel.fetchCategoriesNewsApi(categoryName),
@@ -130,20 +127,73 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                       ),
                                 ),
                               ),
-
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      article.title ?? '',
-                                      maxLines: 3,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.black87,
+                                    InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) => NewsDetailsScreen(
+                                                  newImage:
+                                                      snapshot
+                                                          .data!
+                                                          .articles![index]
+                                                          .urlToImage
+                                                          .toString(),
+                                                  author:
+                                                      snapshot
+                                                          .data!
+                                                          .articles![index]
+                                                          .title
+                                                          .toString(),
+                                                  content:
+                                                      snapshot
+                                                          .data!
+                                                          .articles![index]
+                                                          .publishedAt
+                                                          .toString(),
+                                                  description:
+                                                      snapshot
+                                                          .data!
+                                                          .articles![index]
+                                                          .author
+                                                          .toString(),
+                                                  newsData:
+                                                      snapshot
+                                                          .data!
+                                                          .articles![index]
+                                                          .description
+                                                          .toString(),
+                                                  newsTitle:
+                                                      snapshot
+                                                          .data!
+                                                          .articles![index]
+                                                          .content
+                                                          .toString(),
+                                                  source:
+                                                      snapshot
+                                                          .data!
+                                                          .articles![index]
+                                                          .source
+                                                          .toString(),
+                                                ),
+                                          ),
+                                        );
+                                      },
+                                      child: Text(
+                                        article.title ?? '',
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.black87,
+                                        ),
                                       ),
                                     ),
                                     const SizedBox(height: 8),
@@ -181,9 +231,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   }
                 },
               ),
-           
             ),
-         
           ],
         ),
       ),
